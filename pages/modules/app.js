@@ -1,29 +1,10 @@
 import {randomQuestion} from './data.js'
+import { setTotals, setQuestion } from './logic.js'
 
-let pageData = {
-    totals: {
-        right: 0,
-        wrong: 0,
-        skipped: 0,
-        played: 0
-    }
-}
-
-async function setTotals(tots, ui) {
-    ui.totals.right.innerText = tots.right
-    ui.totals.wrong.innerText = tots.wrong
-    ui.totals.played.innerText = tots.played
-    ui.totals.skipped.innerText = tots.skipped
-}
-
-async function setQuestion(q, ui) {
-    ui.question.innerText = q.question
-}
-
-function response(ui, ans, cb) {
+function response(ui, ans, cb, ctx) {
     return () => {
         cb().then(() => {
-            pageData.selected = {
+            ctx.pageData.selected = {
                 answer: ans,
                 ui
             }
@@ -32,24 +13,24 @@ function response(ui, ans, cb) {
     }
 }
 
-async function setAnswer(ui, ans, cb) {
+async function setAnswer(ui, ans, cb, ctx) {
     ui.innerText = ans.text
     ui.dataset.id = ans._id
-    ui.onclick = response(ui, ans, cb)
+    ui.onclick = response(ui, ans, cb, ctx)
     ui.classList.remove('selected')
 }
 
-function resetSelection(ui) {
+function resetSelection(ctx) {
     return async () => {
-        for (const key in ui.answers) {
-            if (ui.answers.hasOwnProperty(key)) {
-                const element = ui.answers[key];
+        for (const key in ctx.ui.answers) {
+            if (ctx.ui.answers.hasOwnProperty(key)) {
+                const element = ctx.ui.answers[key];
                 element.classList.remove('selected')
                 element.classList.remove('correct')
                 element.classList.remove('wrong')
             }
         }
-        pageData.selected = undefined
+        ctx.pageData.selected = undefined
     }
 }
 
@@ -62,58 +43,60 @@ async function disableSelection(ui) {
     }
 }
 
-async function setAnswers(q, ui) {
-    resetSelection(ui)()
+async function setAnswers(ctx) {
+    resetSelection(ctx)()
         .then(() => {
             return Promise.all([
-                setAnswer(ui.answers.ans1, q.answers[0], resetSelection(ui)),
-                setAnswer(ui.answers.ans2, q.answers[1], resetSelection(ui)),
-                setAnswer(ui.answers.ans3, q.answers[2], resetSelection(ui))
+                setAnswer(ctx.ui.answers.ans1, ctx.q.answers[0], resetSelection(ctx), ctx),
+                setAnswer(ctx.ui.answers.ans2, ctx.q.answers[1], resetSelection(ctx), ctx),
+                setAnswer(ctx.ui.answers.ans3, ctx.q.answers[2], resetSelection(ctx), ctx)
             ])
         })
 }
 
-function skip(ui) {
+function skip(ctx) {
     return function () {
-        if (!pageData.ended) {
-            pageData.totals.skipped = pageData.totals.skipped + 1
+        if (!ctx.pageData.ended) {
+            ctx.pageData.totals.skipped = ctx.pageData.totals.skipped + 1
         }
         return randomQuestion()
-            .then(q => setupPage(q, ui))
+            .then(q => {
+                ctx.q = q
+                return setupPage(ctx)
+            })
     }
 }
 
-async function setupNextButton(ui) {
-    ui.next.onclick = skip(ui)
+async function setupNextButton(ctx) {
+    ctx.ui.next.onclick = skip(ctx)
 }
 
-function validate(ui) {
+function validate(ctx) {
     return function () {
-        if (pageData.selected) {
-            return disableSelection(ui)
+        if (ctx.pageData.selected) {
+            return disableSelection(ctx.ui)
                 .then(() => {
-                    if (pageData.selected.answer.correct) {
-                        pageData.totals.right = pageData.totals.right + 1
-                        pageData.selected.ui.classList.remove('selected')
-                        pageData.selected.ui.classList.add('correct')
+                    if (ctx.pageData.selected.answer.correct) {
+                        ctx.pageData.totals.right = ctx.pageData.totals.right + 1
+                        ctx.pageData.selected.ui.classList.remove('selected')
+                        ctx.pageData.selected.ui.classList.add('correct')
                     } else {
-                        pageData.totals.wrong = pageData.totals.wrong + 1
-                        pageData.selected.ui.classList.remove('selected')
-                        pageData.selected.ui.classList.add('wrong')
+                        ctx.pageData.totals.wrong = ctx.pageData.totals.wrong + 1
+                        ctx.pageData.selected.ui.classList.remove('selected')
+                        ctx.pageData.selected.ui.classList.add('wrong')
                     }
-                    ui.output.text.innerText = pageData.selected.answer.motivation
-                    ui.output.container.classList.remove('hidden')
-                    ui.answer.classList.add('hidden')
-                    pageData.ended = true
+                    ctx.ui.output.text.innerText = ctx.pageData.selected.answer.motivation
+                    ctx.ui.output.container.classList.remove('hidden')
+                    ctx.ui.answer.classList.add('hidden')
+                    ctx.pageData.ended = true
                 })
-                .then(() => console.log('after cliccking', pageData))
         }
     }
 }
 
-async function setupAnswerButton(q, ui) {
-    ui.answer.classList.remove('hidden')
-    ui.answer.onclick = validate(ui)
+async function setupAnswerButton(ctx) {
+    ctx.ui.answer.classList.remove('hidden')
+    ctx.ui.answer.onclick = validate(ctx)
 }
 
 async function resetOuptut(ui) {
@@ -121,20 +104,33 @@ async function resetOuptut(ui) {
     ui.output.text.innerText = ''
 }
 
-async function setupPage(q, ui) {
-    pageData.totals.played = pageData.totals.played + 1
-    pageData.ended = false
+async function setupPage(ctx) {
+    ctx.pageData.totals.played = ctx.pageData.totals.played + 1
+    ctx.pageData.ended = false
     return Promise.all([
-        setTotals(pageData.totals, ui),
-        setQuestion(q, ui),
-        setAnswers(q, ui),
-        setupNextButton(ui),
-        setupAnswerButton(q, ui),
-        resetOuptut(ui)
+        setTotals(ctx.pageData.totals, ctx.ui),
+        setQuestion(ctx.q, ctx.ui),
+        setAnswers(ctx),
+        setupNextButton(ctx),
+        setupAnswerButton(ctx),
+        resetOuptut(ctx.ui)
     ])
 }
 
 export default async function (ui) {
+    const pageData = {
+        totals: {
+            right: 0,
+            wrong: 0,
+            skipped: 0,
+            played: 0
+        }
+    }
+
     return randomQuestion()
-        .then(q => setupPage(q, ui))
+        .then(q => setupPage({
+            pageData,
+            q,
+            ui
+        }))
 }
