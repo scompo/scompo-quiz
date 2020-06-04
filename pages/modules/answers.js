@@ -74,3 +74,8 @@ export function validate(ctx) {
         }
     }
 }
+
+export async function resetOuptut(output) {
+    output.container.classList.add('hidden')
+    output.text.innerText = ''
+}

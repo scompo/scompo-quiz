@@ -1,7 +1,7 @@
 import { randomQuestion } from './data.js'
 import { setTotals } from './totals.js'
 import { setQuestion } from './question.js'
-import { setAnswers, validate } from './answers.js'
+import { setAnswers, validate, resetOuptut } from './answers.js'
 
 function skip(ctx) {
     return function () {
@@ -29,11 +29,6 @@ async function setupAnswerButton(ctx) {
     ctx.ui.answer.onclick = validate(ctx)
 }
 
-async function resetOuptut(ui) {
-    ui.output.container.classList.add('hidden')
-    ui.output.text.innerText = ''
-}
-
 async function setupPage(ctx) {
     ctx.pageData.ended = false
     return Promise.all([
@@ -42,7 +37,7 @@ async function setupPage(ctx) {
         setAnswers(ctx),
         setupNextButton(ctx),
         setupAnswerButton(ctx),
-        resetOuptut(ctx.ui)
+        resetOuptut(ctx.ui.output)
     ])
 }
 
