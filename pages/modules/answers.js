@@ -58,11 +58,11 @@ export function validate(ctx) {
             return disableSelection(ctx.ui)
                 .then(() => {
                     if (ctx.pageData.selected.answer.correct) {
-                        ctx.pageData.totals.right = ctx.pageData.totals.right + 1
+                        ctx.totals.increment({ right: 1 })
                         ctx.pageData.selected.ui.classList.remove('selected')
                         ctx.pageData.selected.ui.classList.add('correct')
                     } else {
-                        ctx.pageData.totals.wrong = ctx.pageData.totals.wrong + 1
+                        ctx.totals.increment({ wrong: 1 })
                         ctx.pageData.selected.ui.classList.remove('selected')
                         ctx.pageData.selected.ui.classList.add('wrong')
                     }

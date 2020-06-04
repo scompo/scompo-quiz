@@ -1,15 +1,15 @@
 import { randomQuestion } from './data.js'
-import { setTotals } from './totals.js'
+import { init as initTotals } from './totals.js'
 import { setQuestion } from './question.js'
 import { setAnswers, validate, resetOuptut } from './answers.js'
 
-function skip(ctx) {
+function skip(ctx, totals) {
     return function () {
 
-        ctx.pageData.totals.played = ctx.pageData.totals.played + 1
+        ctx.totals.increment({ played: 1 })
 
         if (!ctx.pageData.ended) {
-            ctx.pageData.totals.skipped = ctx.pageData.totals.skipped + 1
+            ctx.totals.increment({ skipped: 1 })
         }
 
         return randomQuestion()
@@ -32,7 +32,7 @@ async function setupAnswerButton(ctx) {
 async function setupPage(ctx) {
     ctx.pageData.ended = false
     return Promise.all([
-        setTotals(ctx.pageData.totals, ctx.ui.totals),
+        ctx.totals.updateValues(),
         setQuestion(ctx.q, ctx.ui),
         setAnswers(ctx),
         setupNextButton(ctx),
@@ -42,18 +42,15 @@ async function setupPage(ctx) {
 }
 
 export default async function (ui) {
-    const pageData = {
-        totals: {
-            right: 0,
-            wrong: 0,
-            skipped: 0,
-            played: 0
-        }
-    }
+    const pageData = {}
 
-    return randomQuestion()
-        .then(q => setupPage({
+    return Promise.all([
+        randomQuestion(),
+        initTotals(ui)
+    ])
+        .then(([q,totals]) => setupPage({
             pageData,
+            totals,
             q,
             ui
         }))
