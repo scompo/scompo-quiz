@@ -1,0 +1,103 @@
+* {
+    border:0px;
+    padding: 0px;
+}
+:root{
+    --default-color: black;
+    --default-bg-color: black;
+    --right-color : green;
+    --right-bg-color: white;
+    --wrong-color : red;
+    --wrong-bg-color : white;
+    --selected-color : purple;
+    --selected-bg-color : white;
+    --answer-color : white;
+    --answer-bg-color : blue;
+    --next-color : white;
+    --next-bg-color : grey;
+    --skipped-color: grey;
+}
+
+body {
+    text-align: center;
+}
+
+.answers > li{
+    list-style: none;
+    border: 1px solid var(--default-color);
+    margin: 0.5rem 0.5rem;
+    height: 3rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.answers > .selected{
+    background-color: var(--selected-color);
+    color: var(--selected-bg-color);
+    border: 1px solid var(--selected-bg-color);
+}
+
+.answers > .correct{
+    background-color: var(--right-color);
+    color: var(--right-bg-color);
+    border: 1px solid var(--right-bg-color);
+}
+
+.answers > .wrong{
+    background-color: var(--wrong-color);
+    color: var(--wrong-bg-color);
+    border: 1px solid var(--wrong-bg-color);
+}
+
+#tot-right {
+    color: var(--right-color);
+}
+
+#tot-wrong {
+    color: var(--wrong-color);
+}
+
+#tot-skipped {
+    color: var(--skipped-color);
+}
+
+.hidden {
+    display: none;
+}
+
+button{
+    list-style: none;
+    border: 1px solid var(--default-color);
+    margin: 0.5rem 0.5rem;
+    height: 3rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;  
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 1rem;
+}
+
+.question {
+    margin: 2rem;
+}
+
+label{
+    font-weight: bold;
+}
+
+#answer {
+    color: var(--answer-color);
+    background-color: var(--answer-bg-color);
+}
+
+#next {
+    color: var(--next-color);
+    background-color: var(--next-bg-color);
+}

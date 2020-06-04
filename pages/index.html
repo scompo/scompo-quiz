@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <script type="module" src="main.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Quiz</h1>
+        <h2>a quiz app</h2>
+        <p>Select the correct answer to the question below.</p>
+        <section class="history">
+            <p>Answered <span id="tot-right">0</span> right, <span id="tot-wrong">0</span> wrong, <span id="tot-skipped">0</span> skipped of <span id="tot-played">0</span> total.</p>
+        </section>
+    </header>
+    <main>
+        <article class="quiz">
+            <header>
+                <h3>Quiz</h3>
+            </header>
+            <section class="question">
+                <label for="question-text">Question</label>
+                <p id="question-text">The question goes here?</p>
+            </section>
+            <section>
+                <label for="anwers">Answers</label>
+                <ul class="answers">
+                    <li id="answer-1">First answer.</li>
+                    <li id="answer-2">Second answer.</li>
+                    <li id="answer-3">Third answer.</li>
+                </ul>
+            </section>
+            <section id="res">
+                <label for="output">Why?</label>
+                <p id="output"></p>
+            </section>
+            <section class="controls">
+                <section class="buttons">
+                    <button id="answer">Answer!</button>
+                    <button id="next">Next!</button>
+                </section>
+            </section>
+        </article>
+    </main>
+    <footer>
+        <p>Mauro Scomparin 2020</p>
+    </footer>
+</body>
+</html>
