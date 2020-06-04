@@ -1,5 +1,5 @@
-import {randomQuestion} from './data.js'
-import { setTotals, setQuestion } from './logic.js'
+import { randomQuestion } from './data.js'
+import { setTotals, setQuestion, disableSelection } from './logic.js'
 
 function response(ui, ans, cb, ctx) {
     return () => {
@@ -34,15 +34,6 @@ function resetSelection(ctx) {
     }
 }
 
-async function disableSelection(ui) {
-    for (const key in ui.answers) {
-        if (ui.answers.hasOwnProperty(key)) {
-            const element = ui.answers[key];
-            element.onclick = undefined
-        }
-    }
-}
-
 async function setAnswers(ctx) {
     resetSelection(ctx)()
         .then(() => {
@@ -56,9 +47,13 @@ async function setAnswers(ctx) {
 
 function skip(ctx) {
     return function () {
+
+        ctx.pageData.totals.played = ctx.pageData.totals.played + 1
+
         if (!ctx.pageData.ended) {
             ctx.pageData.totals.skipped = ctx.pageData.totals.skipped + 1
         }
+
         return randomQuestion()
             .then(q => {
                 ctx.q = q
@@ -105,10 +100,9 @@ async function resetOuptut(ui) {
 }
 
 async function setupPage(ctx) {
-    ctx.pageData.totals.played = ctx.pageData.totals.played + 1
     ctx.pageData.ended = false
     return Promise.all([
-        setTotals(ctx.pageData.totals, ctx.ui),
+        setTotals(ctx.pageData.totals, ctx.ui.totals),
         setQuestion(ctx.q, ctx.ui),
         setAnswers(ctx),
         setupNextButton(ctx),
